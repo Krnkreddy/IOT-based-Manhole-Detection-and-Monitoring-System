@@ -14,9 +14,9 @@ Since you've uploaded **Arduino IDE code**, **website files**, and the **project
 
 2. **Project Description**
 
-> "An IoT-based system to detect hazardous manhole conditions using gas, water, tilt, and IR sensors. The system can alert users through SMS (GSM) or live dashboard (WiFi)."
+"An IoT-based system to detect hazardous manhole conditions using gas, water, tilt, and IR sensors. The system can alert users through SMS (GSM) or live dashboard (WiFi)."
 
-#### 3. **Features**
+3. **Features**
 
 * Gas detection using MQ sensors
 * Water level sensing with ultrasonic
@@ -25,7 +25,7 @@ Since you've uploaded **Arduino IDE code**, **website files**, and the **project
 * Sends SMS alerts using SIM800L
 * WiFi dashboard interface using ESPAsyncWebServer
 
-#### 4. **Hardware Used**
+4. **Hardware Used**
 
 List your components:
 
@@ -37,13 +37,22 @@ List your components:
 * SIM800L GSM Module
 * SSD1306 OLED Display (optional)
 
-#### 5. **Circuit Diagram**
+5. **Circuit Diagram**
 
-Upload your schematic image (from Fritzing or any tool).
+| **Component**       | **VCC**          | **GND** | **Signal Pin**             | **Notes**                 |
+| ------------------- | ---------------- | ------- | -------------------------- | ------------------------- |
+| GSM (SIM800L)       | XL6009 OUT+ (4V) | GND     | TX to GPIO16, RX to GPIO17 | Use voltage divider on RX |
+| Ultrasonic Sensor   | 5V (Booster)     | GND     | Trig: GPIO18, Echo: GPIO19 | JSN-SR04T or HC-SR04      |
+| IR Sensor           | 3.3V             | GND     | OUT: GPIO27                | Detects lid open/close    |
+| GPS Module          | 3.3V or 5V       | GND     | TX: GPIO4, RX: GPIO2       | Soft serial               |
+| Gas Sensor          | 5V               | GND     | A0 → GPIO34                | Analog                    |
+| Tilt Sensor         | 3.3V             | GND     | OUT → GPIO26               | Digital HIGH/LOW          |
+| Temp Sensor (DHT11) | 3.3V             | GND     | Data → GPIO25              | Or use LM35 to analog pin |
+| Float Sensor        | 3.3V             | GND     | GPIO14                     | Digital HIGH/LOW          |
+| Buzzer              | 3.3V             | GND     | GPIO15                     | Optional audible alert    |
 
-#### 6. **How to Use**
 
-Give setup instructions:
+6. **How to Use**
 
 ```bash
 1. Clone the repo
@@ -52,38 +61,12 @@ Give setup instructions:
 4. For GSM version: Insert SIM and power module properly
 ```
 
-#### 7. **Screenshots**
+7. **Screenshots**
 
-Add images of:
 
-* Dashboard web interface
-* Hardware prototype
-* SMS alert messages
 
-#### 8. **Demo Video (Optional)**
+8. **Online Source**
 
-Embed a YouTube link showing your project in action.
+Modified some of the components and working according to out source and availability
 
-#### 9. **Contributors**
-
-Mention team members who worked on this project.
-
----
-
-### ✅ Suggestions for YAML
-
-If you asked "what is YAML," here’s a quick explanation:
-
-**YAML (YAML Ain’t Markup Language)** is a human-readable data format used often for:
-
-* Configuration files (`.github/workflows/ci.yml`)
-* Metadata in software
-* Docker, CI/CD pipelines, etc.
-
-You don’t **need** YAML unless you’re using GitHub Actions (e.g., auto-deploying your code, running test scripts, etc.).
-
----
-
-If you share specific feedback you'd like (e.g. on `README.md`, Arduino code optimization, or web UI), I can help tailor improvements more closely.
-
-Would you like me to help you **write a sample README** for your repo?
+https://iotdesignpro.com/projects/iot-manhole-monitoring-system
