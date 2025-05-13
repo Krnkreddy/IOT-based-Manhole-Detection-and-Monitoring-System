@@ -1,0 +1,109 @@
+#include <SoftwareSerial.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+
+// Wi-Fi credentials
+const char* ssid = "KrnkReddy";     // Replace with your Wi-Fi SSID
+const char* password = "123456"; // Replace with your Wi-Fi Password
+const char* server = "http://api.thingspeak.com/update?api_key=YOUR_API_KEY"; // Replace with your IoT server URL
+
+#define sensor D5
+#define ECHOPIN D7
+#define TRIGPIN D6
+int sensorPin = A0;
+
+// Create software serial object to communicate with SIM800L
+SoftwareSerial mySerial(D3, D2); // SIM800L Tx & Rx connected to ESP8266 D3 & D2
+
+void setup() {
+  Serial.begin(115200);
+  mySerial.begin(9600);
+  pinMode(sensor, INPUT);
+  pinMode(ECHOPIN, INPUT_PULLUP);
+  pinMode(TRIGPIN, OUTPUT);
+  digitalWrite(ECHOPIN, HIGH);
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected to Wi-Fi");
+}
+
+void loop() {
+  int readings = digitalRead(sensor);
+  int val = analogRead(A0);
+
+  // Measure Distance
+  digitalWrite(TRIGPIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIGPIN, HIGH);
+  delayMicroseconds(15);
+  digitalWrite(TRIGPIN, LOW);
+  int distance1 = pulseIn(ECHOPIN, HIGH, 26000);
+  int distance = distance1 / 58;
+  Serial.print("Distance: "); Serial.print(distance); Serial.println(" cm");
+
+  // Send alerts via GSM
+  if (readings == 1) {
+    sendSMS("Tilt Detected");
+  }
+  if (distance <= 20) {
+    sendSMS("Water Level Reached");
+  }
+  if (val > 80) {
+    sendSMS("Gas Detected");
+  }
+
+  // Send data to IoT cloud
+  sendToCloud(distance, val, readings);
+
+  delay(5000);
+}
+
+// Function to send SMS alerts via GSM
+void sendSMS(String message) {
+  Serial.println("Sending SMS: " + message);
+  mySerial.println("AT");
+  updateSerial();
+  mySerial.println("AT+CMGF=1");
+  updateSerial();
+  mySerial.println("AT+CMGS=\"+919829559608\""); // Replace with your number
+  updateSerial();
+  mySerial.print(message);
+  updateSerial();
+  mySerial.write(26);
+}
+
+// Function to update serial communication
+void updateSerial() {
+  delay(500);
+  while (Serial.available()) {
+    mySerial.write(Serial.read());
+  }
+  while (mySerial.available()) {
+    Serial.write(mySerial.read());
+  }
+}
+
+// Function to send data to IoT cloud (ThingSpeak)
+void sendToCloud(int distance, int gasLevel, int tilt) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String url = server;
+    url += "&field1=" + String(distance);
+    url += "&field2=" + String(gasLevel);
+    url += "&field3=" + String(tilt);
+    
+    Serial.println("Sending Data to Cloud: " + url);
+    
+    http.begin(url);
+    int httpCode = http.GET();
+    http.end();
+  } else {
+    Serial.println("Wi-Fi Not Connected");
+  }
+}
