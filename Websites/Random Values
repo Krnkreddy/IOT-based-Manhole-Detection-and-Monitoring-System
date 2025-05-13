@@ -1,0 +1,112 @@
+// This is a temporary Webiste which is created for display of random values in Website
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manhole Monitoring Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .sensor-box { border-radius: 15px; padding: 20px; margin: 10px; box-shadow: 0 0 15px #aaa; }
+    .alert-green { background-color: #d4edda; }
+    .alert-red { background-color: #f8d7da; }
+    #googleMap { width: 100%; height: 400px; }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container text-center mt-4">
+    <h2 class="mb-4">🚨 Manhole Monitoring Dashboard</h2>
+    <div class="row">
+      <div class="col-md-4 sensor-box alert-green" id="gasBox">
+        <h5>Gas Detection</h5>
+        <p id="gasValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box alert-green" id="waterBox">
+        <h5>Water Level</h5>
+        <p id="waterValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box alert-green" id="tiltBox">
+        <h5>Tilt Status</h5>
+        <p id="tiltValue">Loading...</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 sensor-box alert-green" id="tempBox">
+        <h5>Temperature</h5>
+        <p id="tempValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box alert-green" id="irBox">
+        <h5>IR Sensor</h5>
+        <p id="irValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box" id="gpsBox">
+        <h5>GPS Location</h5>
+        <a id="gpsLink" href="#" target="_blank">Open in Google Maps</a>
+      </div>
+    </div>
+    
+    <!-- Embedded Google Map -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <h5>Location on Map</h5>
+        <div id="googleMap"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simulate data with random values
+    function generateSampleData() {
+      return {
+        gas: Math.floor(Math.random() * 400 + 100),      // 100 to 500 ppm
+        water: Math.floor(Math.random() * 30),            // 0 to 30 cm
+        tilt: Math.random() < 0.2,                        // 20% chance of tilt
+        temp: (Math.random() * 15 + 20).toFixed(1),       // 20.0 to 35.0 °C
+        ir: Math.random() < 0.3,                          // 30% chance of obstacle
+        lat: 17.385044 + (Math.random() * 0.01),          // Sample latitude near Hyderabad
+        lon: 78.486671 + (Math.random() * 0.01)           // Sample longitude
+      };
+    }
+
+    function updateDashboard(data) {
+      document.getElementById("gasValue").innerText = data.gas + " ppm";
+      document.getElementById("waterValue").innerText = data.water + " cm";
+      document.getElementById("tiltValue").innerText = data.tilt ? "Tilt Detected" : "Stable";
+      document.getElementById("tempValue").innerText = data.temp + " °C";
+      document.getElementById("irValue").innerText = data.ir ? "Obstacle" : "Clear";
+      
+      document.getElementById("gpsLink").href = `https://www.google.com/maps/?entry=wc&ll=${data.lat},${data.lon}`;
+      initMap(data.lat, data.lon);
+
+      // Optional: Color alerts
+      document.getElementById("gasBox").className = data.gas > 400 ? "col-md-4 sensor-box alert-red" : "col-md-4 sensor-box alert-green";
+      document.getElementById("tiltBox").className = data.tilt ? "col-md-4 sensor-box alert-red" : "col-md-4 sensor-box alert-green";
+      document.getElementById("irBox").className = data.ir ? "col-md-4 sensor-box alert-red" : "col-md-4 sensor-box alert-green";
+    }
+
+    function fetchData() {
+      const sample = generateSampleData();
+      updateDashboard(sample);
+    }
+
+    function initMap(lat, lon) {
+      var mapProp = {
+        center: new google.maps.LatLng(lat, lon),
+        zoom: 15,
+      };
+      var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+      var marker = new google.maps.Marker({
+        position: { lat: lat, lng: lon },
+        map: map
+      });
+    }
+
+    setInterval(fetchData, 3000); // Update every 3 seconds
+    fetchData(); // Initial call
+  </script>
+
+  <!-- Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=initMap" async defer></script>
+
+</body>
+</html>
