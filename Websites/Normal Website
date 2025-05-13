@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manhole Monitoring Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .sensor-box { border-radius: 15px; padding: 20px; margin: 10px; box-shadow: 0 0 15px #aaa; }
+    .alert-green { background-color: #d4edda; }
+    .alert-red { background-color: #f8d7da; }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container text-center mt-4">
+    <h2 class="mb-4">🚨 Manhole Monitoring Dashboard</h2>
+    <div class="row">
+      <div class="col-md-4 sensor-box alert-green" id="gasBox">
+        <h5>Gas Detection</h5>
+        <p id="gasValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box alert-green" id="waterBox">
+        <h5>Water Level</h5>
+        <p id="waterValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box alert-green" id="tiltBox">
+        <h5>Tilt Status</h5>
+        <p id="tiltValue">Loading...</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 sensor-box alert-green" id="tempBox">
+        <h5>Temperature</h5>
+        <p id="tempValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box alert-green" id="irBox">
+        <h5>IR Sensor</h5>
+        <p id="irValue">Loading...</p>
+      </div>
+      <div class="col-md-4 sensor-box" id="gpsBox">
+        <h5>GPS Location</h5>
+        <a id="gpsLink" href="#" target="_blank">Open in Maps</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function fetchData() {
+      fetch("/sensor")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("gasValue").innerText = data.gas + " ppm";
+          document.getElementById("waterValue").innerText = data.water + " cm";
+          document.getElementById("tiltValue").innerText = data.tilt ? "Tilt Detected" : "Stable";
+          document.getElementById("tempValue").innerText = data.temp + " °C";
+          document.getElementById("irValue").innerText = data.ir ? "Obstacle" : "Clear";
+          document.getElementById("gpsLink").href = `https://maps.google.com/?q=${data.lat},${data.lon}`;
+        });
+    }
+    setInterval(fetchData, 3000); // Auto update every 3 seconds
+  </script>
+</body>
+</html>
