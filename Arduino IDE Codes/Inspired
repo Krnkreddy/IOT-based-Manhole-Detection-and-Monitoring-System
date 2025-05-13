@@ -1,3 +1,5 @@
+// This code is from the Internet and We have modified come of the code and updated it below
+
 #include <SoftwareSerial.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
