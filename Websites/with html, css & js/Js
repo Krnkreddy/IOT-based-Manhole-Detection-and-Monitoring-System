@@ -1,0 +1,20 @@
+$(document).ready(function () {
+    function fetchData() {
+        $.ajax({
+            url: "https://api.example.com/manhole-data", // Replace with actual API endpoint
+            method: "GET",
+            success: function (data) {
+                $("#gas-level").text(data.gas + " ppm");
+                $("#temperature").text(data.temperature + "°C");
+                $("#water-level").text(data.water + "%");
+                $("#lid-status").text(data.lid_status ? "Open" : "Closed");
+            },
+            error: function () {
+                console.error("Error fetching data");
+            }
+        });
+    }
+
+    fetchData();
+    setInterval(fetchData, 5000); // Refresh every 5 seconds
+});
